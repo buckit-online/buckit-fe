@@ -30,7 +30,7 @@ function OrderPanelAdmin() {
   const [newOrderNotification, setNewOrderNotification] = useState(false)
   const [notificationMessage, setNotificationMessage] = useState('')
 
-  const [playNotificationSound] = useSound(notificationSound, { volume: 5 })
+  const [playNotificationSound] = useSound(notificationSound, { volume: 0.7 })
 
   const navigate = useNavigate()
   useEffect(() => {
@@ -41,7 +41,7 @@ function OrderPanelAdmin() {
 
   useEffect(() => {
     if (cafeId) {
-      const wsUrl = `ws://192.168.1.2:8080?cafeId=${cafeId}`
+      const wsUrl = `${import.meta.env.VITE_WS_URL}?cafeId=${cafeId}`
 
       console.log('Connecting to WebSocket:', wsUrl)
       const ws = new WebSocket(wsUrl)
@@ -134,6 +134,36 @@ function OrderPanelAdmin() {
     fetchCategories()
   }, [cafeId])
 
+  // const fetchOrders = async () => {
+  //   try {
+  //     const res = await fetch(
+  //       `${
+  //         import.meta.env.VITE_APP_URL
+  //       }/server/orderDetails/getOrders/${cafeId}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     )
+  //     const data = await res.json()
+
+  //     if (res.ok) {
+  //       if (Array.isArray(data) && data.length > 0) {
+  //         const sortedOrders = data.sort(
+  //           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  //         )
+  //         setOrdersList(sortedOrders)
+  //       } else {
+  //         setOrdersList([])
+  //       }
+  //     } else {
+  //       setError(`Error: ${data.message}`)
+  //     }
+  //   } catch (error) {
+  //     setError('Failed to fetch orders')
+  //   }
+  // }
   const fetchOrders = async () => {
     try {
       const res = await fetch(
@@ -154,17 +184,20 @@ function OrderPanelAdmin() {
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           )
           setOrdersList(sortedOrders)
+          return sortedOrders // Add this line to return the orders
         } else {
           setOrdersList([])
+          return [] // Return empty array
         }
       } else {
         setError(`Error: ${data.message}`)
+        return null
       }
     } catch (error) {
       setError('Failed to fetch orders')
+      return null
     }
   }
-
   const refetchOrders = () => {
     fetchOrders()
   }
@@ -265,12 +298,12 @@ function OrderPanelAdmin() {
   return (
     <div className="w-full min-h-full flex overflow-hidden">
       {/* WebSocket Status Indicator */}
-      {!websocketConnected && (
-        <div className="fixed bottom-4 right-4 bg-blue text-white px-4 py-2 rounded-lg shadow-lg z-50">
-          <span className="mr-2">●</span>
-          Live updates unavailable
-        </div>
-      )}
+      {/*}{!websocketConnected && (
+        // <div className="fixed bottom-4 right-4 bg-blue text-white px-4 py-2 rounded-lg shadow-lg z-50">
+        //   <span className="mr-2">●</span>
+        //   Live updates unavailable
+        // </div>
+      )} */}
 
       {/* New Order Notification */}
       {newOrderNotification && (
